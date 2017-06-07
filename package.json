@@ -1,0 +1,25 @@
+{
+  "name": "test-es6",
+  "version": "1.0.0",
+  "description": "''",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/yuban12315/test.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/yuban12315/test/issues"
+  },
+  "homepage": "https://github.com/yuban12315/test#readme",
+  "dependencies": {
+    "async": "^2.4.1",
+    "superagent": "^3.5.2",
+    "superagent-charset": "^1.2.0",
+    "superagent-retry": "^0.6.0"
+  }
+}
