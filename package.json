@@ -18,6 +18,7 @@
   "homepage": "https://github.com/yuban12315/test#readme",
   "dependencies": {
     "async": "^2.4.1",
+    "cheerio": "^1.0.0-rc.1",
     "superagent": "^3.5.2",
     "superagent-charset": "^1.2.0",
     "superagent-retry": "^0.6.0"
