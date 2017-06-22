@@ -14,7 +14,7 @@ async.waterfall([
         })
     },
     (callback)=>{
-        test.getMainPage((err,res)=>{
+        test.getCurriculum((err,res)=>{
             if(err) callback(err)
             else {
                 console.log(res)

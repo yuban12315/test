@@ -22,9 +22,9 @@ class jwxt {
             mm:this.getPassword()
         }).end((err,res)=>{
             if(!err){
-                if(res.hasOwnProperty('text')){
-                    console.log(res.text)
-                }
+                // if(res.hasOwnProperty('text')){
+                //     console.log(res.text)
+                // }
                 if(res.hasOwnProperty('header')){
                     let cookie=res.header['set-cookie']
                     if(cookie){
@@ -42,13 +42,51 @@ class jwxt {
         })
     }
 
+    //获取主页
     getMainPage(callback){
         let cookie=this.getCookie()
         if(cookie!=null){
-            request.get(`${this.baseUrl}/xkAction.do`).set(this.browserMsg).set('Cookie',cookie)
+            // http://jwxt.imu.edu.cn/menu/s_main.jsp
+            request.get(`${this.baseUrl}/menu/s_main.jsp`).set(this.browserMsg).set('Cookie',cookie)
                 .charset('GBK').end((err,res)=>{
                 if(res.hasOwnProperty('text')){
                     callback(null,res.text)
+                }
+                else {
+                    callback(new Error('服务器错误'),500)
+                }
+            })
+        }
+        else callback(new Error('未登录'))
+    }
+
+    //获取课程表
+    getCurriculum(callback){
+        let cookie=this.getCookie()
+        if(cookie!=null){
+            // http://jwxt.imu.edu.cn/xkAction.do?actionType=6
+            request.get(`${this.baseUrl}/xkAction.do?actionType=6`).set(this.browserMsg).set('Cookie',cookie)
+                .charset('GBK').end((err,res)=>{
+                if(res.hasOwnProperty('text')){
+                    //获取到了课表，开始分析
+                    let $=cheerio.load(res.text,{decodeEntities: false})
+
+                    /**
+                     * 列表：
+                     * tr2.td3-10     第一节
+                     * tr3.td2-9      第二节
+                     * tr4.td2-9      第三节
+                     * tr5.td2-9      第四节
+                     * tr6.td3-10    第五节
+                     * tr7.td-2-9    第六节
+                     * tr8.td2-9     第七节
+                     * tr9.td2-9     第八节
+                     *
+                     * */
+
+                    let html=$('#user>tbody>tr:nth-child(2)>td:nth-child(1)').html()
+                    html=html.replace(/\n/g,'')
+                    callback(null,html)
                 }
                 else {
                     callback(new Error('服务器错误'),500)
