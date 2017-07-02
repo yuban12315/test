@@ -13,8 +13,8 @@ class qiniu {
 
     uptoken() {
         let put_policy = new storage.rs.PutPolicy(this.bucket + ":" + this.key)
-        put_policy.callbackUrl = 'http://ocxi5zst0.bkt.clouddn.com/callback.php'
-        put_policy.callbackBody = 'filename=$(fname)&filesize=$(fsize)'
+        //put_policy.callbackUrl = 'http://ocxi5zst0.bkt.clouddn.com/callback.php'
+       //put_policy.callbackBody = 'filename=$(fname)&filesize=$(fsize)'
         return put_policy.token()
     }
 

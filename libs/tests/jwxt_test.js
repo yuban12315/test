@@ -8,13 +8,13 @@ async.waterfall([
         test.login((err,res)=>{
             if(err) callback(err)
             else {
-                console.log(res)
+                //console.log(res)
                 callback(null)
             }
         })
     },
     (callback)=>{
-        test.getCurriculum((err,res)=>{
+        test.chooseCourse((err,res)=>{
             if(err) callback(err)
             else {
                 console.log(res)
@@ -24,4 +24,5 @@ async.waterfall([
     }
 ],(err,res)=>{
     //集中处理err
+    if(err) console.log(err.message)
 })
