@@ -106,7 +106,7 @@ class jwxt {
      * 传入课程json数组
      * 格式为[{
      * courseNumber(课程号)：number,
-     * Serial number(课序号):  number
+     * serialNumber(课序号):  number
      * }]
      * */
     chooseCourse(courses, callback) {
@@ -126,11 +126,9 @@ class jwxt {
                                     //可以选课，获取方案计划号
                                     else {
                                         let number
-                                        let $=cheerio.load(res.text)
-
-                                        number=$()
-
-                                        callback(null,number)
+                                        let $ = cheerio.load(res.text)
+                                        number = $('input[name="fajhh"]').attr('value')
+                                        callback(null, number)
                                     }
                                 }
                                 else {
@@ -142,8 +140,36 @@ class jwxt {
                             }
                         })
                     },
-                    (number,callback) => {
-
+                    (number, callback) => {
+                        request.get(`${this.baseUrl}/xkAction.do?actionType=-1&fajhh=${number}`).set(this.browserMsg).set('Cookie', cookie).charset('GBK').end((err, res) => callback(err))
+                    },
+                    (callback) => {
+                        request.get(`${this.baseUrl}xkAction.do?actionType=2&pageNumber=-1&oper1=ori`).set(this.browserMsg).set('Cookie', cookie).charset('GBK').end((err, res) => callback(err))
+                    },
+                    (callback) => {
+                        async.map(courses, (item, callback) => {
+                            let courseNumber = item.courseNumber, serialNumber = item.serialNumber
+                            request.get(`${this.baseUrl}jhxn=&kcsxdm=&kch=${courseNumber}&cxkxh=${serialNumber}&actionType=2&oper2=gl&pageNumber=-1`).set(this.browserMsg).set('Cookie', cookie).set.end((err, res) => {
+                                if (err) {
+                                    callback(err)
+                                }
+                                else {
+                                    request.get(`xkAction.do?kcId=${courseNumber}_${serialNumber}&preActionType=2&actionType=9`).set(this.browserMsg)
+                                        .set('Cookie', cookie).charset('GBK').end((err, res) => {
+                                        if (err) {
+                                            callback(err)
+                                        }
+                                        else if (res.hasOwnProperty('text')) {
+                                            if (res.text.includes('成功')) {
+                                                callback(null,`选${courseNumber}成功`)
+                                            }
+                                            else callback(new Error('选课失败'))
+                                        }
+                                        else callback(new Error('服务器错误'))
+                                    })
+                                }
+                            })
+                        },(err,res)=>callback(err,res))
                     }
                 ],
                 (err, res) => callback(err, res))
