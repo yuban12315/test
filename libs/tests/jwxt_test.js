@@ -14,7 +14,9 @@ async.waterfall([
         })
     },
     (callback)=>{
-        test.chooseCourse((err,res)=>{
+        test.chooseCourse({
+
+        },(err,res)=>{
             if(err) callback(err)
             else {
                 console.log(res)

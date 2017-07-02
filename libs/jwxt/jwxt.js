@@ -68,7 +68,7 @@ class jwxt {
             // http://jwxt.imu.edu.cn/xkAction.do?actionType=6
             request.get(`${this.baseUrl}/xkAction.do?actionType=6`).set(this.browserMsg).set('Cookie', cookie)
                 .charset('GBK').end((err, res) => {
-                if(!err){
+                if (!err) {
                     if (res.hasOwnProperty('text')) {
                         //获取到了课表，开始分析
                         let $ = cheerio.load(res.text, {decodeEntities: false})
@@ -102,33 +102,51 @@ class jwxt {
         else callback(new Error('未登录'))
     }
 
-    //选课
-    chooseCourse(callback) {
+    /**选课
+     * 传入课程json数组
+     * 格式为[{
+     * courseNumber(课程号)：number,
+     * Serial number(课序号):  number
+     * }]
+     * */
+    chooseCourse(courses, callback) {
         let cookie = this.cookie
         if (cookie != null) {
             async.waterfall([
+                    //获取选课状态
                     (callback) => {
                         //http://202.207.0.238:8081/xkAction.do
                         request.get(`${this.baseUrl}/xkAction.do`).set(this.browserMsg).set('Cookie', cookie)
                             .charset('GBK').end((err, res) => {
-                            if(!err){
-                                if(res.hasOwnProperty('text')){
-                                    if(res.text.includes('对不起、非选课阶段不允许选课')){
+                            if (!err) {
+                                if (res.hasOwnProperty('text')) {
+                                    if (res.text.includes('不允许选课')) {
                                         callback(new Error('未到选课时间'))
                                     }
-                                    else callback(null,'ss')
+                                    //可以选课，获取方案计划号
+                                    else {
+                                        let number
+                                        let $=cheerio.load(res.text)
+
+                                        number=$()
+
+                                        callback(null,number)
+                                    }
                                 }
-                                else{
+                                else {
                                     callback(new Error('服务器错误'))
                                 }
                             }
-                            else{
+                            else {
                                 callback(err)
                             }
                         })
+                    },
+                    (number,callback) => {
+
                     }
                 ],
-                (err, res) => callback(err,res))
+                (err, res) => callback(err, res))
         }
         else callback(new Error('未登录'))
     }
