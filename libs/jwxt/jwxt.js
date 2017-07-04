@@ -102,6 +102,52 @@ class jwxt {
         else callback(new Error('未登录'))
     }
 
+    /**获取考试成绩=-=
+     * 返回成绩数组
+     * 格式为
+     * [{name:String,
+     * score:String}]*/
+    getScores(callback) {
+        let cookie = this.cookie
+        if (cookie != null) {
+            //http://202.207.0.238:8081/gradeLnAllAction.do?type=ln&oper=qbinfo&lnxndm=2016-2017%D1%A7%C4%EA%B4%BA(%C8%FD%D1%A7%C6%DA)
+            request.get(`${this.baseUrl}/gradeLnAllAction.do?type=ln&oper=qbinfo`).set(this.browserMsg).set('Cookie', cookie).charset('GBK').end((err, res) => {
+                if (err) {
+                    callback(err)
+                }
+                else {
+                    if (res.hasOwnProperty('text')) {
+                        let $ = cheerio.load(res.text,{decodeEntities: false})
+                        let data=[]
+                        $ = cheerio.load($(".titleTop2").last().html(),{decodeEntities: false})
+                        $('.odd').each(function (i, e) {
+                            //console.log($(this).html())
+                            let html = `<table>${$(this).html()}</table>`
+                            let $1 = cheerio.load(html, {decodeEntities: false})
+                            data.push({
+                                name:'',
+                                score:''
+                            })
+                            $1('td').each(function (i1, e) {
+                                if (i1 == 2) {
+                                    data[i].name=$1(this).text().replace(/\s/g,'')
+                                }
+                                if(i1==6){}
+                                data[i].score=$1(this).text().replace(/\s/g,'')
+                            })
+                        })
+                        callback(null,data)
+                    }
+                    else {
+                        callback(new Error('服务器错误'))
+                    }
+                }
+
+            })
+        }
+        else callback(new Error('未登录'))
+    }
+
     /**选课
      * 传入课程json数组
      * 格式为[{
@@ -161,7 +207,7 @@ class jwxt {
                                         }
                                         else if (res.hasOwnProperty('text')) {
                                             if (res.text.includes('成功')) {
-                                                callback(null,`选${courseNumber}成功`)
+                                                callback(null, `选${courseNumber}成功`)
                                             }
                                             else callback(new Error('选课失败'))
                                         }
@@ -169,7 +215,7 @@ class jwxt {
                                     })
                                 }
                             })
-                        },(err,res)=>callback(err,res))
+                        }, (err, res) => callback(err, res))
                     }
                 ],
                 (err, res) => callback(err, res))

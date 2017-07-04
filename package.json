@@ -20,6 +20,7 @@
     "async": "^2.4.1",
     "cheerio": "^1.0.0-rc.1",
     "he": "^1.1.1",
+    "iconv-lite": "^0.4.18",
     "qiniu": "^6.1.13",
     "superagent": "^3.5.2",
     "superagent-charset": "^1.2.0",

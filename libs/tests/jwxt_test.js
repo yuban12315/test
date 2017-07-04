@@ -1,4 +1,5 @@
 let jwxt=require('./../jwxt/jwxt')
+let fs=require('fs')
 let async=require('async')
 
 let test=new jwxt('0151123843','2535286679')
@@ -8,18 +9,16 @@ async.waterfall([
         test.login((err,res)=>{
             if(err) callback(err)
             else {
-                //console.log(res)
+                console.log(res)
                 callback(null)
             }
         })
     },
     (callback)=>{
-        test.chooseCourse({
-
-        },(err,res)=>{
+        test.getScores((err,res)=>{
             if(err) callback(err)
             else {
-                console.log(res)
+                if(res)console.log(res)
                 callback(null)
             }
         })
