@@ -7,7 +7,7 @@ class jwxt {
         this.username = username
         this.password = password
         //内蒙古大学教务系统
-        this.baseUrl = 'http://202.207.0.238:8081'
+        this.baseUrl = 'http://202.207.0.238:8085/'
         this.browserMsg = {
             "User-Agent": "Mozilla/5.0 (Windows NT 6.3; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/48.0.2564.116 Safari/537.36",
             'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'
@@ -208,9 +208,11 @@ class jwxt {
                                             callback(err)
                                         }
                                         else if (res.hasOwnProperty('text')) {
-                                            console.log(res.text)
                                             if (res.text.includes('成功')) {
                                                 callback(null, `选${courseNumber}成功`)
+                                            }
+                                            if(res.text.includes('已经选择')){
+                                                callback(null,`已经选择了${courseNumber}`)
                                             }
                                             else callback(new Error('选课失败'))
                                         }
