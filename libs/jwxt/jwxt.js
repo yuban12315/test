@@ -7,7 +7,7 @@ class jwxt {
         this.username = username
         this.password = password
         //内蒙古大学教务系统
-        this.baseUrl = 'http://202.207.0.238:8085'
+        this.baseUrl = 'http://202.207.0.238:8081'
         this.browserMsg = {
             "User-Agent": "Mozilla/5.0 (Windows NT 6.3; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/48.0.2564.116 Safari/537.36",
             'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'
@@ -86,8 +86,8 @@ class jwxt {
                          *
                          * */
 
-                        let html = $('#user>tbody>tr:nth-child(2)>td:nth-child(1)').html()
-                        html = html.replace(/\n/g, '')
+                        //let html = $('#user>tbody>tr:nth-child(2)>td:nth-child(1)').html()
+                        let html = $.html().replace(/\n/g, '')
                         callback(null, html)
                     }
                     else {
@@ -171,9 +171,11 @@ class jwxt {
                                     }
                                     //可以选课，获取方案计划号
                                     else {
+                                        console.log('可以选课，获取方案计划号')
                                         let number
                                         let $ = cheerio.load(res.text)
                                         number = $('input[name="fajhh"]').attr('value')
+                                        console.log('方案计划号：'+number)
                                         callback(null, number)
                                     }
                                 }
@@ -190,22 +192,23 @@ class jwxt {
                         request.get(`${this.baseUrl}/xkAction.do?actionType=-1&fajhh=${number}`).set(this.browserMsg).set('Cookie', cookie).charset('GBK').end((err, res) => callback(err))
                     },
                     (callback) => {
-                        request.get(`${this.baseUrl}xkAction.do?actionType=2&pageNumber=-1&oper1=ori`).set(this.browserMsg).set('Cookie', cookie).charset('GBK').end((err, res) => callback(err))
+                        request.get(`${this.baseUrl}/xkAction.do?actionType=2&pageNumber=-1&oper1=ori`).set(this.browserMsg).set('Cookie', cookie).charset('GBK').end((err, res) => callback(err))
                     },
                     (callback) => {
                         async.map(courses, (item, callback) => {
                             let courseNumber = item.courseNumber, serialNumber = item.serialNumber
-                            request.get(`${this.baseUrl}jhxn=&kcsxdm=&kch=${courseNumber}&cxkxh=${serialNumber}&actionType=2&oper2=gl&pageNumber=-1`).set(this.browserMsg).set('Cookie', cookie).set.end((err, res) => {
+                            request.get(`${this.baseUrl}/xkAction.do?jhxn=&kcsxdm=&kch=${courseNumber}&cxkxh=${serialNumber}&actionType=2&oper2=gl&pageNumber=-1`).set(this.browserMsg).set('Cookie', cookie).end((err, res) => {
                                 if (err) {
                                     callback(err)
                                 }
                                 else {
-                                    request.get(`xkAction.do?kcId=${courseNumber}_${serialNumber}&preActionType=2&actionType=9`).set(this.browserMsg)
+                                    request.get(`${this.baseUrl}/xkAction.do?kcId=${courseNumber}_${serialNumber}&preActionType=2&actionType=9`).set(this.browserMsg)
                                         .set('Cookie', cookie).charset('GBK').end((err, res) => {
                                         if (err) {
                                             callback(err)
                                         }
                                         else if (res.hasOwnProperty('text')) {
+                                            console.log(res.text)
                                             if (res.text.includes('成功')) {
                                                 callback(null, `选${courseNumber}成功`)
                                             }
