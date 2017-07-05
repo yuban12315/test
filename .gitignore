@@ -1,4 +1,5 @@
 .idea
 node_modules
 libs/tests
+libs/tests/jwxt_test.js
 libs/config.js

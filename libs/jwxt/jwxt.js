@@ -148,7 +148,7 @@ class jwxt {
         else callback(new Error('未登录'))
     }
 
-    /**选课
+    /**选课--
      * 传入课程json数组
      * 格式为[{
      * courseNumber(课程号)：number,
