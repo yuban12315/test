@@ -61,7 +61,16 @@ class jwxt {
         else callback(new Error('未登录'))
     }
 
-    //获取课程表
+    /**获取课程表
+     * 返回课程表数组
+     * 格式为
+     * {
+                name: '',
+                credit: '',
+                teacher: '',
+                time: [],
+                address:''
+            }*/
     getCurriculum(callback) {
         let cookie = this.getCookie()
         if (cookie != null) {
@@ -86,9 +95,69 @@ class jwxt {
                          *
                          * */
 
-                        //let html = $('#user>tbody>tr:nth-child(2)>td:nth-child(1)').html()
-                        let html = $.html().replace(/\n/g, '')
-                        callback(null, html)
+                        let data = []
+                        $ = cheerio.load($('.titleTop2').last().html(), {decodeEntities: false})
+
+                        $('.odd').each(function (i, e) {
+                            let index = parseInt(i / 2)
+                            let $1 = cheerio.load(`<table>${$(this).html()}</table>`, {decodeEntities: false})
+                            if (i % 2 == 0) {
+                                data.push({
+                                    name: '',
+                                    credit: '',
+                                    teacher: '',
+                                    time: [],
+                                    address: ''
+                                })
+
+                                $1('td').each(function (i1, e) {
+                                    if (i1 == 2) {
+                                        data[index].name = $1(this).html().replace(/\s/g, '')
+                                    }
+                                    if (i1 == 4) {
+                                        data[index].credit = $1(this).html().replace(/\s/g, '')
+                                    }
+                                    if (i1 == 7) {
+                                        data[index].teacher = $1(this).html().replace(/\s|\*/g, '')
+                                    }
+                                    //时间处理
+                                    if (i1 == 11) {
+                                        data[index].time.push('')
+                                        data[index].time[0] += $1(this).html().replace(/\s/g, '') + '-'
+                                    }
+                                    if (i1 == 12) {
+                                        data[index].time[0] += '星期' + $1(this).html().replace(/\s|\*/g, '')
+                                    }
+                                    //地址处理
+                                    if (i1 == 15) {
+                                        data[index].address += $1(this).html().replace(/\s/g, '') + '-'
+                                    }
+                                    if (i1 == 16) {
+                                        data[index].address += $1(this).html().replace(/\s/g, '') + '-'
+                                    }
+                                    if (i1 == 17) {
+                                        data[index].address += $1(this).html().replace(/\s/g, '')
+                                    }
+
+                                })
+
+                            }
+                            else {
+                                $1('td').each(function (i1, e) {
+
+                                    if (i1 == 0) {
+                                        data[index].time.push('')
+                                        data[index].time[1] += $1(this).html().replace(/\s/g, '') + '-'
+                                    }
+                                    if (i1 == 1) {
+                                        data[index].time[1] += '星期' + $1(this).html().replace(/\s|\*/g, '')
+                                    }
+                                })
+                            }
+
+
+                        })
+                        callback(null, data)
                     }
                     else {
                         callback(new Error('服务器错误'), 500)
@@ -117,26 +186,27 @@ class jwxt {
                 }
                 else {
                     if (res.hasOwnProperty('text')) {
-                        let $ = cheerio.load(res.text,{decodeEntities: false})
-                        let data=[]
-                        $ = cheerio.load($(".titleTop2").last().html(),{decodeEntities: false})
+                        let $ = cheerio.load(res.text, {decodeEntities: false})
+                        let data = []
+                        $ = cheerio.load($(".titleTop2").last().html(), {decodeEntities: false})
                         $('.odd').each(function (i, e) {
                             //console.log($(this).html())
                             let html = `<table>${$(this).html()}</table>`
                             let $1 = cheerio.load(html, {decodeEntities: false})
                             data.push({
-                                name:'',
-                                score:''
+                                name: '',
+                                score: ''
                             })
                             $1('td').each(function (i1, e) {
                                 if (i1 == 2) {
-                                    data[i].name=$1(this).text().replace(/\s/g,'')
+                                    data[i].name = $1(this).text().replace(/\s/g, '')
                                 }
-                                if(i1==6){}
-                                data[i].score=$1(this).text().replace(/\s/g,'')
+                                if (i1 == 6) {
+                                }
+                                data[i].score = $1(this).text().replace(/\s/g, '')
                             })
                         })
-                        callback(null,data)
+                        callback(null, data)
                     }
                     else {
                         callback(new Error('服务器错误'))
@@ -175,7 +245,7 @@ class jwxt {
                                         let number
                                         let $ = cheerio.load(res.text)
                                         number = $('input[name="fajhh"]').attr('value')
-                                        console.log('方案计划号：'+number)
+                                        console.log('方案计划号：' + number)
                                         callback(null, number)
                                     }
                                 }
@@ -211,8 +281,8 @@ class jwxt {
                                             if (res.text.includes('成功')) {
                                                 callback(null, `选${courseNumber}成功`)
                                             }
-                                            if(res.text.includes('已经选择')){
-                                                callback(null,`已经选择了${courseNumber}`)
+                                            if (res.text.includes('已经选择')) {
+                                                callback(null, `已经选择了${courseNumber}`)
                                             }
                                             else callback(new Error('选课失败'))
                                         }
