@@ -61,6 +61,39 @@ class jwxt {
         else callback(new Error('未登录'))
     }
 
+    /**教学评估*/
+    evaluation(callback) {
+        let cookie = this.getCookie()
+        if (cookie != null) {
+            async.waterfall([
+                (callback) => {
+                    //获取课程列表
+                    request.get(this.baseUrl + 'jxpgXsAction.do?oper=listWj').set(this.browserMsg).set('Cookie', cookie).charset('GBK')
+                        .end((err, res) => {
+                            if (!err) {
+                                if(res.hasOwnProperty('text')){
+                                    //console.log(res.text)
+
+                                    callback(null,res.text)
+                                }
+                                else {
+                                    callback(new Error('服务器错误'), 500)
+                                }
+                            }
+                            else {
+                                callback(err)
+                            }
+                        })
+                }
+            ],(err,res)=>{
+                callback(err,res)
+            })
+        }
+        else {
+            callback(new Error('未登录'))
+        }
+    }
+
     /**获取课程表
      * 返回课程表数组
      * 格式为
